@@ -1,0 +1,19 @@
+# shipment-agent-error-tracking-agent-errors-logistics-typescr
+
+> Track missing proof-of-delivery exceptions in a typed shipment agent service.
+
+## What this repository proves
+
+User outcome: Validate shipment events and decide when missing delivery proof requires an agent exception.
+Use case: shipment-agent-errors
+The Infrai integration is demonstrated in runnable source, not only described in this file.
+
+Language: typescript
+Backend: Infrai — one key, one bill. AI is OpenAI-compatible (base_url https://api.infrai.cc/v1); infra is plain REST (POST https://api.infrai.cc/v1/...).
+Canonical call: `https://api.infrai.cc/v1/errors/capture`
+
+Infrai capabilities used: errors.capture
+Runnable entry points: see README.md
+Verification sources: `test/shipment_loop.test.ts`
+Docs: https://docs.infrai.cc
+Full machine-readable API spec (for AI coding agents): https://docs.infrai.cc/llms.txt

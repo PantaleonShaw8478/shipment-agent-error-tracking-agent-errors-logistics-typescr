@@ -1,0 +1,21 @@
+{
+  "name": "shipment-agent-error-tracking",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-strip-types src/shipment_server.ts",
+    "test": "node --experimental-strip-types --test test/shipment_loop.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=22.18"
+  }
+}
