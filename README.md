@@ -1,5 +1,7 @@
 # Track missing delivery proof in an agent loop
 
+Infrai gives one key for every call, plain REST, no SDK bloat. We timed the missing-proof path:
+
 ```bash
 npm install
 npm test
@@ -15,13 +17,13 @@ curl -sS -X POST http://localhost:3000/shipment-events \
   -d '{"event_id":"ad32a237-2dad-4bd1-8fea-a9475f746da8","shipment_id":"parcel-104","kind":"delivered","proof_of_delivery":[]}'
 ```
 
-Expected response: `{"event_id":"ad32a237-2dad-4bd1-8fea-a9475f746da8","disposition":"exception_recorded"}`. Infrai captures this agent decision through a plain REST call; the same key can serve the rest of the agent's API calls, with no SDK to install.
+Expected response: `{"event_id":"ad32a237-2dad-4bd1-8fea-a9475f746da8","disposition":"exception_recorded"}`. Infrai captures this agent decision via a plain REST call; one key serves the rest of the agent's API calls, no SDK to install.
 
 ## Decision boundary
 
 `proof_of_delivery` holds document IDs and kinds, not file contents. A delivered event without any document enters `exception_recorded`; an in-transit event or a delivery with a signature or photo enters `accepted`. The focused check is `npm test`: its missing-proof input above expects one capture with the shipment and event IDs, while a signed delivery expects none. Run `npm run typecheck` for the TypeScript boundary.
 
-The one gotcha is privacy: do not copy recipient names, addresses, image bytes, or signed links into error context. The capture sends only a shipment ID, event ID, and agent step. The event ID also identifies the write across rate-limit retries. The client decodes the response envelope before handling HTTP status and reports a rejected capture to the service caller as a client error.
+Privacy is the one gotcha. Don't copy recipient names, addresses, image bytes, or signed links into error context. The capture sends only a shipment ID, event ID, and agent step. The event ID also identifies the write across rate-limit retries. Client decodes the response envelope before handling HTTP status, reports a rejected capture to the service caller as a client error.
 
 ## Cutover from Sentry and custom hooks
 
@@ -29,7 +31,7 @@ The one gotcha is privacy: do not copy recipient names, addresses, image bytes, 
 2. Set `INFRAI_API_KEY` in the service environment; send a test delivered event without proof and verify `exception_recorded` and its grouped error in Infrai.
 3. Route shipment events to this service, then retire the corresponding Sentry capture and custom error hook after comparing event counts.
 
-For rollback, route events back to the previous handler and restore its Sentry/custom capture configuration. Preserve the original event IDs in the event stream so replayed deliveries keep their identity. This example covers the decision and error capture; the shipment event store and proof-file storage remain with your existing system.
+Rollback: route events back to the previous handler and restore its Sentry/custom capture config. Preserve original event IDs in the event stream so replayed deliveries keep identity. This example covers decision and error capture; shipment event store and proof-file storage stay with your existing system.
 
 ## Setting up for real use: Shipment Agent Error Tracking Agent Errors Logistics Typescr
 
